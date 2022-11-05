@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'savings.apps.SavingsConfig',
     # third parties
     'solo.apps.SoloAppConfig',
+    'rest_framework.apps.RestFrameworkConfig',
 ]
 
 MIDDLEWARE = [

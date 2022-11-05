@@ -1,0 +1,12 @@
+# virtualenv
+venv/
+
+# dev db
+db.sqlite3
+
+# Python
+*.pyc
+__pycache__
+*.egg-info
+*.mo
+

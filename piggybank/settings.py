@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # project's apps
     'savings.apps.SavingsConfig',
+    # third parties
+    'solo.apps.SoloAppConfig',
 ]
 
 MIDDLEWARE = [

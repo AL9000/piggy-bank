@@ -37,6 +37,9 @@ COPY --chown=al9000:al9000 . .
 # Use user "al9000" to run the build commands below and the server itself.
 USER al9000
 
+# Collect static files.
+RUN python manage.py collectstatic --noinput --clear
+
 # Runtime command that executes when "docker run" is called, it does the
 # following:
 #   1. Migrate the database.

@@ -3,21 +3,22 @@ from rest_framework.exceptions import ErrorDetail
 from rest_framework.test import APITestCase
 
 from savings.models import PiggyBank
-from savings.views import SHAKING_ERROR_MSG
+from savings.exceptions import PiggyBankDoesNotExists
 
 
 class PyggyBankShakingTestCase(APITestCase):
     def test_shake_piggybank_must_returns_an_error_if_the_piggybank_was_not_created_before(self):
         url = resolve_url("shake-piggybank")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 412)
-        self.assertEqual(response.data, SHAKING_ERROR_MSG)
+        self.assertEqual(response.status_code, PiggyBankDoesNotExists.status_code)
+        self.assertEqual(response.data["detail"], PiggyBankDoesNotExists.default_detail)
 
     def test_shake_piggybank_must_returns_its_savings_amount(self):
-        PiggyBank.objects.create(savings=2000)  # 2000 euro cents = 20€
+        saving_amount = 2000
+        PiggyBank.objects.create(savings=saving_amount)  # 2000 euro cents = 20€
         url = resolve_url("shake-piggybank")
         response = self.client.get(url)
-        self.assertEqual(response.data, 2000)
+        self.assertEqual(response.data["savings"], saving_amount)
 
 
 class PyggyBankMakingSavingsTestCase(APITestCase):

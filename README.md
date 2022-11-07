@@ -2,6 +2,17 @@
 
 ## Installation
 
+### Using docker-compose :
+
+Just call this command :
+```shell
+docker-compose up
+```
+
+You can now access the DRF browsable API directly with your favorite Firefox browser at http://0.0.0.0:8000
+
+### "all-in-one" container
+
 Using docker, first build the image :
 ```shell
 docker build -t "piggybank:Dockerfile" .
@@ -16,7 +27,7 @@ You can now access the DRF browsable API directly with your favorite Firefox bro
 
 ### Extras
 
-You can see code coverage after running the image.
+You can see code coverage after calling `docker-compose up`.
 
 ## API docs
 

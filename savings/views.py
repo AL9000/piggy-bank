@@ -2,7 +2,7 @@ from rest_framework.generics import RetrieveUpdateDestroyAPIView
 from rest_framework.response import Response
 
 from savings.models import PiggyBank
-from savings.serializers import PiggyBankSavingsSerializer, PiggyBankSerializer
+from savings.serializers import PiggyBankSavingsSerializer, PiggyBankFullSerializer
 
 
 class PiggyBankAPIView(RetrieveUpdateDestroyAPIView):
@@ -24,7 +24,7 @@ class PiggyBankAPIView(RetrieveUpdateDestroyAPIView):
     def get_serializer_class(self):
         if self.request.method == "GET":
             return PiggyBankSavingsSerializer
-        return PiggyBankSerializer
+        return PiggyBankFullSerializer
 
     def get_object(self):
         return PiggyBank.get_solo()

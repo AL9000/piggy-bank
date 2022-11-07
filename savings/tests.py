@@ -4,7 +4,7 @@ from rest_framework.status import HTTP_200_OK
 from rest_framework.test import APITestCase
 
 from savings.models import PiggyBank
-from savings.serializers import PiggyBankSerializer
+from savings.serializers import PiggyBankFullSerializer
 
 
 class PyggyBankShakingTestCase(APITestCase):
@@ -77,10 +77,10 @@ class BreakPyggyBankTestCase(APITestCase):
         response = self.client.get(url)
         self.assertEqual(response.data["total_savings"], "0.00 €")
         piggy_bank.refresh_from_db()
-        # test that all field names that begin by 'euro' or 'cent' are reset to 0.0
+        # test that all field names that begin by 'euro' or 'cent' are reset to 0
         for field in PiggyBank._meta.get_fields():
-            if field.name[:5] in ["euro", "cent"]:
-                self.assertEqual(getattr(piggy_bank, field.name), 0.0)  # pragma: no cover
+            if field.name[:4] in ["euro", "cent"]:
+                self.assertEqual(getattr(piggy_bank, field.name), 0)
 
     def test_breaking_the_piggybank_must_give_back_all_the_savings(self):
         """You are not able to save a negative amount of any coin or banknote."""
@@ -89,7 +89,7 @@ class BreakPyggyBankTestCase(APITestCase):
         piggy_bank.euro_five = 8
         piggy_bank.cent_five = 14
         piggy_bank.save()
-        serializer = PiggyBankSerializer(instance=piggy_bank)
+        serializer = PiggyBankFullSerializer(instance=piggy_bank)
         url = resolve_url("piggy-bank")
         response = self.client.get(url)
         self.assertEqual(response.data["total_savings"], "42.70 €")

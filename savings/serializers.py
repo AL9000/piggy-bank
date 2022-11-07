@@ -16,23 +16,7 @@ class PiggyBankSavingsSerializer(serializers.ModelSerializer):
         fields = ["total_savings"]
 
 
-class PiggyBankSerializer(serializers.ModelSerializer):
+class PiggyBankFullSerializer(serializers.ModelSerializer):
     class Meta:
         model = PiggyBank
-        fields = [
-            "cent_one",
-            "cent_two",
-            "cent_five",
-            "cent_ten",
-            "cent_twenty",
-            "cent_fifty",
-            "euro_one",
-            "euro_two",
-            "euro_five",
-            "euro_ten",
-            "euro_twenty",
-            "euro_fifty",
-            "euro_hundred",
-            "euro_two_hundred",
-            "euro_five_hundred",
-        ]
+        exclude = ["id", "total_savings"]

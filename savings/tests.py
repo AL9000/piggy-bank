@@ -1,76 +1,98 @@
 from django.shortcuts import resolve_url
 from rest_framework.exceptions import ErrorDetail
+from rest_framework.status import HTTP_200_OK
 from rest_framework.test import APITestCase
 
 from savings.models import PiggyBank
-from savings.exceptions import PiggyBankDoesNotExists
+from savings.serializers import PiggyBankSerializer
 
 
 class PyggyBankShakingTestCase(APITestCase):
-    def test_shake_piggybank_must_returns_an_error_if_the_piggybank_was_not_created_before(self):
+    def test_shake_empty_piggybank_must_returns_zero(self):
         url = resolve_url("piggy-bank")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, PiggyBankDoesNotExists.status_code)
-        self.assertEqual(response.data["detail"], PiggyBankDoesNotExists.default_detail)
+        self.assertEqual(response.status_code, HTTP_200_OK)
+        self.assertEqual(response.data["total_savings"], "0.00 €")
 
     def test_shake_piggybank_must_returns_its_savings_amount(self):
-        saving_amount = 2000
-        PiggyBank.objects.create(savings=saving_amount)  # 2000 euro cents = 20€
+        euro_one_nb = 1  # save 1 euro
+        PiggyBank.objects.create(euro_one=euro_one_nb)
         url = resolve_url("piggy-bank")
         response = self.client.get(url)
-        self.assertEqual(response.data["savings"], saving_amount)
+        self.assertEqual(response.data["total_savings"], "1.00 €")
 
 
 class PyggyBankMakingSavingsTestCase(APITestCase):
     def test_saving_money_for_the_first_time(self):
         """You must save at least 0.01€, as it is the smallest coin that exists."""
         url = resolve_url("piggy-bank")
-        saving_amount = 1
-        response = self.client.put(url, {"savings": saving_amount})
+        data = {"cent_one": 1}
+        response = self.client.put(url, data)
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, data)
         piggybank = PiggyBank.get_solo()
-        self.assertEqual(piggybank.savings, saving_amount)
+        self.assertEqual(piggybank.cent_one, data["cent_one"])
 
     def test_saving_money_on_a_existing_piggy_bank(self):
-        initial_savings = 123456789
-        PiggyBank.objects.create(savings=initial_savings)
+        euro_twenty_initial_nb = 10
+        PiggyBank.objects.create(euro_twenty=euro_twenty_initial_nb)
         url = resolve_url("piggy-bank")
-        saving_amount = 987654321
-        response = self.client.put(url, {"savings": saving_amount})
+        data = {"euro_twenty": 32}
+        response = self.client.put(url, data)
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, data)
         piggybank = PiggyBank.get_solo()
-        self.assertEqual(piggybank.savings, initial_savings + saving_amount)
-
-    def test_saving_amount_cant_be_zero(self):
-        """You are not able to save 0 euros, or even save a negative amount."""
-        url = resolve_url("piggy-bank")
-        response = self.client.put(url, {"savings": 0})
-        self.assertEqual(response.status_code, 400)
-        self.assertEqual(
-            response.data,
-            {
-                "savings": [
-                    ErrorDetail(
-                        string='Ensure this value is greater than or equal to 1.',
-                        code='min_value',
-                    )
-                ]
-            },
-        )
+        final_euro_twenty_nb = euro_twenty_initial_nb + data["euro_twenty"]
+        self.assertEqual(piggybank.euro_twenty, final_euro_twenty_nb)
+        self.assertEqual(piggybank.total_savings, final_euro_twenty_nb * 2_000)
 
     def test_saving_amount_cant_be_negative(self):
-        """You are not able to save 0 euros, or even save a negative amount."""
+        """You are not able to save a negative amount of any coin or banknote."""
         url = resolve_url("piggy-bank")
-        response = self.client.put(url, {"savings": -42})
+        response = self.client.put(url, {"euro_twenty": -42})
         self.assertEqual(response.status_code, 400)
         self.assertEqual(
             response.data,
             {
-                "savings": [
+                "euro_twenty": [
                     ErrorDetail(
-                        string='Ensure this value is greater than or equal to 1.',
+                        string='Ensure this value is greater than or equal to 0.',
                         code='min_value',
                     )
                 ]
             },
         )
+
+
+class BreakPyggyBankTestCase(APITestCase):
+    def test_breaking_the_piggybank_must_reset_every_fields_to_zero(self):
+        piggy_bank = PiggyBank.get_solo()
+        piggy_bank.euro_one = 2
+        piggy_bank.save()
+        url = resolve_url("piggy-bank")
+        response = self.client.get(url)
+        self.assertEqual(response.data["total_savings"], "2.00 €")
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get(url)
+        self.assertEqual(response.data["total_savings"], "0.00 €")
+        piggy_bank.refresh_from_db()
+        # test that all field names that begin by 'euro' or 'cent' are reset to 0.0
+        for field in PiggyBank._meta.get_fields():
+            if field.name[:5] in ["euro", "cent"]:
+                self.assertEqual(getattr(piggy_bank, field.name), 0.0)  # pragma: no cover
+
+    def test_breaking_the_piggybank_must_give_back_all_the_savings(self):
+        """You are not able to save a negative amount of any coin or banknote."""
+        piggy_bank = PiggyBank.get_solo()
+        piggy_bank.euro_one = 2
+        piggy_bank.euro_five = 8
+        piggy_bank.cent_five = 14
+        piggy_bank.save()
+        serializer = PiggyBankSerializer(instance=piggy_bank)
+        url = resolve_url("piggy-bank")
+        response = self.client.get(url)
+        self.assertEqual(response.data["total_savings"], "42.70 €")
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, serializer.data)

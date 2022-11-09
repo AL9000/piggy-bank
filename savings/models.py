@@ -4,6 +4,10 @@ from django.utils.translation import gettext_lazy as _
 from solo.models import SingletonModel
 
 
+class PositiveIntegerValidatorField(models.PositiveIntegerField):
+    default_validators = [MinValueValidator(0)]
+
+
 class PiggyBank(SingletonModel):
     CENTS_TO_EUROS = {
         "cent_one": 1,
@@ -23,61 +27,23 @@ class PiggyBank(SingletonModel):
         "euro_five_hundred": 50_000,
     }
 
-    cent_one = models.PositiveIntegerField(
-        _("one cent"), default=0, blank=True, validators=[MinValueValidator(0)]
-    )
-    cent_two = models.PositiveIntegerField(
-        _("two cent"), default=0, blank=True, validators=[MinValueValidator(0)]
-    )
-    cent_five = models.PositiveIntegerField(
-        _("five cent"), default=0, blank=True, validators=[MinValueValidator(0)]
-    )
-    cent_ten = models.PositiveIntegerField(
-        _("ten cent"), default=0, blank=True, validators=[MinValueValidator(0)]
-    )
-    cent_twenty = models.PositiveIntegerField(
-        _("twenty cent"), default=0, blank=True, validators=[MinValueValidator(0)]
-    )
-    cent_fifty = models.PositiveIntegerField(
-        _("fifty cent"), default=0, blank=True, validators=[MinValueValidator(0)]
-    )
-    euro_one = models.PositiveIntegerField(
-        _("one euro"), default=0, blank=True, validators=[MinValueValidator(0)]
-    )
-    euro_two = models.PositiveIntegerField(
-        _("two euro"), default=0, blank=True, validators=[MinValueValidator(0)]
-    )
-    euro_five = models.PositiveIntegerField(
-        _("five euro"), default=0, blank=True, validators=[MinValueValidator(0)]
-    )
-    euro_ten = models.PositiveIntegerField(
-        _("ten euro"), default=0, blank=True, validators=[MinValueValidator(0)]
-    )
-    euro_twenty = models.PositiveIntegerField(
-        _("twenty euro"), default=0, blank=True, validators=[MinValueValidator(0)]
-    )
-    euro_fifty = models.PositiveIntegerField(
-        _("fifty euro"), default=0, blank=True, validators=[MinValueValidator(0)]
-    )
-    euro_one_hundred = models.PositiveIntegerField(
-        _("one hundred euro"), default=0, blank=True, validators=[MinValueValidator(0)]
-    )
-    euro_two_hundred = models.PositiveIntegerField(
-        _("two hundred euro"), default=0, blank=True, validators=[MinValueValidator(0)]
-    )
-    euro_five_hundred = models.PositiveIntegerField(
-        _("five hundred euro"), default=0, blank=True, validators=[MinValueValidator(0)]
-    )
-
-    total_savings = models.PositiveIntegerField(_(""), default=0)
+    cent_one = PositiveIntegerValidatorField(_("one cent"), default=0, blank=True)
+    cent_two = PositiveIntegerValidatorField(_("two cents"), default=0, blank=True)
+    cent_five = PositiveIntegerValidatorField(_("five cents"), default=0, blank=True)
+    cent_ten = PositiveIntegerValidatorField(_("ten cents"), default=0, blank=True)
+    cent_twenty = PositiveIntegerValidatorField(_("twenty cents"), default=0, blank=True)
+    cent_fifty = PositiveIntegerValidatorField(_("fifty cents"), default=0, blank=True)
+    euro_one = PositiveIntegerValidatorField(_("one euro"), default=0, blank=True)
+    euro_two = PositiveIntegerValidatorField(_("two euros"), default=0, blank=True)
+    euro_five = PositiveIntegerValidatorField(_("five euros"), default=0, blank=True)
+    euro_ten = PositiveIntegerValidatorField(_("ten euros"), default=0, blank=True)
+    euro_twenty = PositiveIntegerValidatorField(_("twenty euros"), default=0, blank=True)
+    euro_fifty = PositiveIntegerValidatorField(_("fifty euros"), default=0, blank=True)
+    euro_one_hundred = PositiveIntegerValidatorField(_("one hundred euros"), default=0, blank=True)
+    euro_two_hundred = PositiveIntegerValidatorField(_("two hundred euros"), default=0, blank=True)
+    euro_five_hundred = PositiveIntegerValidatorField(_("five hundred euros"), default=0, blank=True)
 
     class Meta:
         verbose_name = _("Piggy bank")
         # there is only one piggy bank instance at any time
         verbose_name_plural = _("Piggy bank")
-
-    def save(self, *args, **kwargs):
-        self.total_savings = 0
-        for key, value in self.CENTS_TO_EUROS.items():
-            self.total_savings += getattr(self, key) * value
-        super().save(*args, **kwargs)

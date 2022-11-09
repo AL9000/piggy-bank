@@ -29,7 +29,6 @@ class PyggyBankMakingSavingsTestCase(APITestCase):
         data = {"cent_one": 1}
         response = self.client.put(url, data)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data, data)
         piggybank = PiggyBank.get_solo()
         self.assertEqual(piggybank.cent_one, data["cent_one"])
 
@@ -40,11 +39,9 @@ class PyggyBankMakingSavingsTestCase(APITestCase):
         data = {"euro_twenty": 32}
         response = self.client.put(url, data)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data, data)
         piggybank = PiggyBank.get_solo()
         final_euro_twenty_nb = euro_twenty_initial_nb + data["euro_twenty"]
         self.assertEqual(piggybank.euro_twenty, final_euro_twenty_nb)
-        self.assertEqual(piggybank.total_savings, final_euro_twenty_nb * 2_000)
 
     def test_saving_amount_cant_be_negative(self):
         """You are not able to save a negative amount of any coin or banknote."""
@@ -73,7 +70,7 @@ class BreakPyggyBankTestCase(APITestCase):
         response = self.client.get(url)
         self.assertEqual(response.data["total_savings"], "2.00 €")
         response = self.client.delete(url)
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 204)
         response = self.client.get(url)
         self.assertEqual(response.data["total_savings"], "0.00 €")
         piggy_bank.refresh_from_db()
@@ -94,5 +91,5 @@ class BreakPyggyBankTestCase(APITestCase):
         response = self.client.get(url)
         self.assertEqual(response.data["total_savings"], "42.70 €")
         response = self.client.delete(url)
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 204)
         self.assertEqual(response.data, serializer.data)

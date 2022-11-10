@@ -53,8 +53,8 @@ class PyggyBankMakingSavingsTestCase(APITestCase):
             {
                 "euro_twenty": [
                     ErrorDetail(
-                        string='Ensure this value is greater than or equal to 0.',
-                        code='min_value',
+                        string="Ensure this value is greater than or equal to 0.",
+                        code="min_value",
                     )
                 ]
             },

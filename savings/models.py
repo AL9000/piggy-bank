@@ -31,17 +31,27 @@ class PiggyBank(SingletonModel):
     cent_two = PositiveIntegerValidatorField(_("two cents"), default=0, blank=True)
     cent_five = PositiveIntegerValidatorField(_("five cents"), default=0, blank=True)
     cent_ten = PositiveIntegerValidatorField(_("ten cents"), default=0, blank=True)
-    cent_twenty = PositiveIntegerValidatorField(_("twenty cents"), default=0, blank=True)
+    cent_twenty = PositiveIntegerValidatorField(
+        _("twenty cents"), default=0, blank=True
+    )
     cent_fifty = PositiveIntegerValidatorField(_("fifty cents"), default=0, blank=True)
     euro_one = PositiveIntegerValidatorField(_("one euro"), default=0, blank=True)
     euro_two = PositiveIntegerValidatorField(_("two euros"), default=0, blank=True)
     euro_five = PositiveIntegerValidatorField(_("five euros"), default=0, blank=True)
     euro_ten = PositiveIntegerValidatorField(_("ten euros"), default=0, blank=True)
-    euro_twenty = PositiveIntegerValidatorField(_("twenty euros"), default=0, blank=True)
+    euro_twenty = PositiveIntegerValidatorField(
+        _("twenty euros"), default=0, blank=True
+    )
     euro_fifty = PositiveIntegerValidatorField(_("fifty euros"), default=0, blank=True)
-    euro_one_hundred = PositiveIntegerValidatorField(_("one hundred euros"), default=0, blank=True)
-    euro_two_hundred = PositiveIntegerValidatorField(_("two hundred euros"), default=0, blank=True)
-    euro_five_hundred = PositiveIntegerValidatorField(_("five hundred euros"), default=0, blank=True)
+    euro_one_hundred = PositiveIntegerValidatorField(
+        _("one hundred euros"), default=0, blank=True
+    )
+    euro_two_hundred = PositiveIntegerValidatorField(
+        _("two hundred euros"), default=0, blank=True
+    )
+    euro_five_hundred = PositiveIntegerValidatorField(
+        _("five hundred euros"), default=0, blank=True
+    )
 
     class Meta:
         verbose_name = _("Piggy bank")

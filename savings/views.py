@@ -1,3 +1,4 @@
+from rest_framework import status
 from rest_framework.generics import RetrieveUpdateDestroyAPIView
 from rest_framework.response import Response
 
@@ -29,18 +30,8 @@ class PiggyBankAPIView(RetrieveUpdateDestroyAPIView):
     def get_object(self):
         return PiggyBank.get_solo()
 
-    def update(self, request, *args, **kwargs):
-        serializer = self.get_serializer_class()(data=request.data)
-        if serializer.is_valid(raise_exception=True):
-            piggybank = self.get_object()
-            for key, value in serializer.validated_data.items():
-                # add all new coins and banknotes to the existing ones in the piggy bank
-                setattr(piggybank, key, getattr(piggybank, key) + value)
-            piggybank.save()
-        return Response(serializer.data)
-
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
-        serializer = self.get_serializer_class()(instance=instance)
+        serializer = self.get_serializer(instance=instance)
         self.perform_destroy(instance)
-        return Response(serializer.data)
+        return Response(data=serializer.data, status=status.HTTP_204_NO_CONTENT)

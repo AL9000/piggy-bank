@@ -4,23 +4,11 @@
 
 ### Using docker-compose :
 
-Just call this command :
+Weird "bug" with docker-compose, ot does not wait for the db container to be ready to run the web container ...
+
+So you have to call this command twice:
 ```shell
 docker-compose up
-```
-
-You can now access the DRF browsable API directly with your favorite Firefox browser at http://0.0.0.0:8000
-
-### "all-in-one" container
-
-Using docker, first build the image :
-```shell
-docker build -t "piggybank:Dockerfile" .
-```
-
-After that, run the image :
-```shell
-docker run -it -p 8000:8000 piggybank:Dockerfile
 ```
 
 You can now access the DRF browsable API directly with your favorite Firefox browser at http://0.0.0.0:8000
